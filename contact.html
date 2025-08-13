@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تواصل — SEOUDY TECH</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="site-header"><div class="container header-inner"><div class="brand"><img src="assets/logo.png" class="logo"><div><h1>SEOUDY TECH</h1></div></div><nav class="main-nav"><a href="index.html">الرئيسية</a><a href="services.html">الخدمات</a><a href="contact.html">تواصل</a><a href="admin/index.html">لوحة المشرف</a></nav></div></header>
+<main class="container">
+  <div class="card">
+    <h2>تواصل معنا</h2>
+    <form onsubmit="sendWhatsApp(event)">
+      <label>الاسم<input id="name" required></label>
+      <label>رقم الجوال<input id="phone" required></label>
+      <label>نوع الخدمة المطلوبة<textarea id="msg" rows="4" required></textarea></label>
+      <button class="btn" type="submit">إرسال عبر واتساب</button>
+    </form>
+  </div>
+</main>
+<footer class="site-footer"><div class="container">© 2025 SEOUDY TECH</div></footer>
+<script>
+function sendWhatsApp(e){
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const phone = document.getElementById('phone').value;
+  const msg = document.getElementById('msg').value;
+  const text = encodeURIComponent(`طلب خدمة من: ${name}\nرقم: ${phone}\nتفاصيل: ${msg}`);
+  window.open(`https://wa.me/966530988576?text=${text}`,'_blank');
+}
+</script>
+</body></html>

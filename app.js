@@ -1,0 +1,1 @@
+console.log('SEOUDY ELECTRIC site loaded');

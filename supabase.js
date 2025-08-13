@@ -1,0 +1,3 @@
+export const SUPABASE_URL="https://fylkqzpmemudrnlenyvp.supabase.co";
+export const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5bGtxenBtZW11ZHJubGVueXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNjEyMjgsImV4cCI6MjA3MDYzNzIyOH0.Juvoz80CjJyxmKzdcT53aoJpGsOP7z5KClguwRNouyI";
+export const SUPABASE_BUCKET="images";

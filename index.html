@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SEOUDY TECH — خدمات الإلكترونيات</title>
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+    <div class="brand">
+      <img src="assets/images/user_1.png" alt="logo">
+      <div>SEOUDY TECH<span class="badge" style="margin-right:10px">إلكترونيات / جوالات / كمبيوتر</span></div>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#services">الخدمات</a></li>
+        <li><a href="#gallery">المعرض</a></li>
+        <li><a href="#blog">المدونة</a></li>
+        <li><a href="admin/">لوحة المشرف</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero container">
+  <h1>حلول إلكترونية متكاملة للجوال والكمبيوتر</h1>
+  <p>صيانة هاردوير وسوفتوير — استرجاع بيانات — تركيب قطع — إعداد وتجهيز البرامج — بخدمة احترافية وسريعة.</p>
+  <a class="btn" href="#services">استعرض خدماتنا</a>
+  <a class="btn alt" href="#gallery">المعرض</a>
+</section>
+
+<section id="services" class="section container">
+  <h2>الخدمات</h2>
+  <div class="grid services">
+    <div class="card">
+      <img class="resp" src="assets/images/user_2.png" alt="صيانة الجوال">
+      <h3>صيانة الجوالات</h3>
+      <p>تبديل شاشات وبطاريات، إصلاح منافذ الشحن، حلول الشبكات، معالجة الأعطال المائية، وتحديث النظام.</p>
+    </div>
+    <div class="card">
+      <img class="resp" src="assets/images/user_3.png" alt="صيانة الكمبيوتر">
+      <h3>صيانة الكمبيوتر</h3>
+      <p>ترقية الرام والتخزين، تنظيف المراوح، حلول التبريد، تثبيت أنظمة التشغيل، استعادة البيانات.</p>
+    </div>
+    <div class="card">
+      <img class="resp" src="assets/images/user_4.png" alt="برامج وتجهيز">
+      <h3>البرامج الجاهزة</h3>
+      <p>تثبيت وتفعيل أهم البرامج، إعداد الأمان والنسخ الاحتياطي، حلول الشركات الصغيرة والمتوسطة.</p>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="section container">
+  <h2>المعرض (Supabase)</h2>
+  <div id="galleryGrid" class="grid gallery"></div>
+  <p class="badge">يتم سحب أحدث الصور من الباكت: <strong>images</strong></p>
+</section>
+
+<section id="blog" class="section container">
+  <h2>المدونة</h2>
+  <div class="grid blog">
+    <div class="card"><h3>زيادة عمر بطارية الجوال</h3><p>قلل السطوع، فعّل وضع التوفير، استخدم شواحن أصلية، وحدث النظام.</p><a class="btn" href="#">قراءة المزيد</a></div>
+    <div class="card"><h3>اختيار لابتوب مناسب</h3><p>حدد الاستخدام، راقب المعالج والرام والتخزين، ووازن الوزن مع الأداء.</p><a class="btn" href="#">قراءة المزيد</a></div>
+    <div class="card"><h3>أهم البرامج بعد الفورمات</h3><p>حزمة مكتبية، متصفح، مضاد فيروسات، أدوات ضغط، وبرامج تعريفات.</p><a class="btn" href="#">قراءة المزيد</a></div>
+  </div>
+</section>
+
+<div class="footer"><div class="container">© <span id="y"></span> SEOUDY TECH — جميع الحقوق محفوظة.</div></div>
+
+<script type="module">
+  document.getElementById('y').textContent = new Date().getFullYear();
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from "./config/supabase.js";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  async function loadGallery(){
+    const grid = document.getElementById('galleryGrid');
+    grid.innerHTML = '...';
+    const { data, error } = await supabase.storage.from(SUPABASE_BUCKET).list('', { limit: 24, sortBy: { column: 'name', order: 'desc' } });
+    if(error){ grid.innerHTML='تعذر تحميل الصور'; return; }
+    grid.innerHTML='';
+    for(const f of data){
+      const { data:pub } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(f.name);
+      const card = document.createElement('div');
+      card.className='card';
+      card.innerHTML = `<img class="resp" src="${pub.publicUrl}" alt="${f.name}"><div class="small">${f.name}</div>`;
+      grid.appendChild(card);
+    }
+  }
+  loadGallery();
+</script>
+</body>
+</html>

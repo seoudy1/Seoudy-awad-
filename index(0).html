@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>لوحة المشرف — SEOUDY TECH</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>.gate{max-width:420px;margin:40px auto}</style>
+</head>
+<body>
+<header>
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+    <div class="brand"><div>SEOUDY TECH</div></div>
+    <nav><ul><li><a href="../">العودة للموقع</a></li></ul></nav>
+  </div>
+</header>
+
+<main class="container section">
+  <div id="gate" class="card gate">
+    <h2>دخول المشرف</h2>
+    <label>كلمة المرور
+      <input id="pwd" type="password" placeholder="••••••••" class="input" />
+    </label>
+    <br>
+    <button id="enter" class="btn">دخول</button>
+    <div id="msg" class="small"></div>
+  </div>
+
+  <div id="panel" style="display:none">
+    <div class="card">
+      <h2>رفع الصور إلى Supabase (images)</h2>
+      <div class="grid" style="grid-template-columns:1fr auto">
+        <input id="prefix" placeholder="مجلد داخلي: services/" value="services/" class="input">
+        <input id="files" type="file" multiple accept="image/*" class="input">
+      </div>
+      <br>
+      <button id="upload" class="btn">رفع</button>
+      <button id="refresh" class="btn alt">تحديث</button>
+      <div id="uploadMsg" class="small"></div>
+    </div>
+
+    <div class="card">
+      <h3>ملفات الباكت</h3>
+      <div id="list" class="grid gallery"></div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  const PASSWORD = "asm1980ASM@";
+  const gate = document.getElementById('gate');
+  const panel = document.getElementById('panel');
+  const msg = document.getElementById('msg');
+  document.getElementById('enter').addEventListener('click', ()=>{{
+    const v = document.getElementById('pwd').value;
+    if(v === PASSWORD){{ gate.style.display='none'; panel.style.display='block'; }}
+    else{{ msg.textContent='كلمة المرور غير صحيحة'; }}
+  }});
+
+  import {{ createClient }} from "https://esm.sh/@supabase/supabase-js@2";
+  import {{ SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET }} from "../config/supabase.js";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const input = document.getElementById('files');
+  const prefix = document.getElementById('prefix');
+  const listDiv = document.getElementById('list');
+  const uploadMsg = document.getElementById('uploadMsg');
+
+  async function listFiles(){{
+    listDiv.innerHTML = '...';
+    const {{ data, error }} = await supabase.storage.from(SUPABASE_BUCKET).list('', {{ limit: 100, sortBy: {{ column: 'name', order: 'desc' }} }});
+    if(error){{ listDiv.innerHTML = 'تعذر جلب الملفات: ' + error.message; return; }}
+    listDiv.innerHTML = '';
+    for(const item of data){{
+      const {{ data: pub }} = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(item.name);
+      const url = pub.publicUrl;
+      const div = document.createElement('div');
+      div.className='card';
+      div.innerHTML = `<img class="resp" src="${{url}}" alt="${{item.name}}">
+                       <div class="small">${{item.name}}</div>
+                       <button data-name="${{item.name}}" class="btn" style="background:#ff5b6b;color:#111">حذف</button>`;
+      listDiv.appendChild(div);
+    }}
+    listDiv.querySelectorAll('button[data-name]').forEach(btn=>{{
+      btn.onclick = async ()=>{{
+        const name = btn.getAttribute('data-name');
+        if(confirm('حذف ' + name + '؟')){{
+          const {{ error }} = await supabase.storage.from(SUPABASE_BUCKET).remove([name]);
+          if(error) alert('خطأ: ' + error.message); else listFiles();
+        }}
+      }};
+    }});
+  }}
+
+  document.getElementById('upload').addEventListener('click', async ()=>{{
+    if(!input.files.length){{ uploadMsg.textContent='اختر صوراً أولاً'; return; }}
+    uploadMsg.textContent='جارِ الرفع...';
+    for(const file of input.files){{
+      const path = (prefix.value || '') + file.name;
+      const {{ error }} = await supabase.storage.from(SUPABASE_BUCKET).upload(path, file, {{ upsert:false }});
+      if(error){{ uploadMsg.textContent='فشل الرفع: ' + error.message; return; }}
+    }}
+    uploadMsg.textContent='تم الرفع بنجاح';
+    input.value='';
+    listFiles();
+  }});
+
+  document.getElementById('refresh').addEventListener('click', listFiles);
+</script>
+</body>
+</html>
